@@ -5,19 +5,11 @@ import javax.swing.*;
 import java.net.*;
 public class BonApetit extends JFrame{
     //paneles
-    private JPanel categorias;
-    private JLabel textoCategorias;
-    private JPanel recetas;
-    private JPanel filtroIngredientes;
-    private JPanel resultado;
-    private JLabel textoResultado;
+    private JPanel categorias,recetas,filtroIngredientes,resultado;
     
-    //botones categorias
-    private JButton ensalada;
-    private JButton picoteo;
-    private JButton platoprincipal;
-    private JButton tragos;
-    private JButton postres;
+    //elementos categorias
+    private JButton ensalada,picoteo,platoprincipal,tragos,postres;
+    private JLabel textoCategorias;
     
     //elementos filtro ingredientes
     private JTextField buscador;
@@ -33,57 +25,41 @@ public class BonApetit extends JFrame{
     
     //constructor
     public BonApetit(){
-        //instanciar los paneles
-        categorias = new JPanel();
-        recetas = new JPanel();
-        filtroIngredientes = new JPanel();
-        resultado = new JPanel();
+        //titulo de la interfaz
+        setTitle("Bon Apetit v1.0");
         
-        //icono categoria
+        //instanciar los paneles
+        construirCategorias();
+        filtroIngredientes();
+        contruirRecetas();
+        construirResultadoBusqueda();
+        
+        pack();
+    }
+    
+    void construirCategorias(){
+        //inicializar el panel de categoria
+        categorias = new JPanel();
+        
+        //instanciar la foto de icono
         URL imageurl = getClass().getResource("icon.jpg");
         ImageIcon iconcategoria = new ImageIcon(imageurl);
         Image newicon = iconcategoria.getImage();
         Image resized = newicon.getScaledInstance(50, 40, Image.SCALE_SMOOTH);
         iconcategoria = new ImageIcon(resized);
         
-        //instanciar los labels
+        //inicializar el label
         textoCategorias = new JLabel(iconcategoria);
-        textoRecetas = new JLabel();
-        textoResultado = new JLabel();
+        textoCategorias.setHorizontalAlignment(SwingConstants.LEFT);
         
-        //instanciar botones categorias
+        //inicializar los botones
         picoteo = new JButton("picoteo");
         ensalada = new JButton("ensaladas");
         platoprincipal = new JButton("dishes");
         tragos = new JButton("tragos");
         postres = new JButton("postres");
         
-        //instanciar elementos filtro ingredientes
-        buscador = new JTextField("Buscar ingrediente", 20);
-        String[] ingr = {"Carne", "Papas", "Tomate"};
-        ingredientes = new JList(ingr);
-        contenedoringredientes = new JScrollPane(ingredientes);
-        
-        //instanciar elementos display
-        
-        fotoreceta = new JLabel();
-        ingredientesreceta = new JLabel();
-        preparacionreceta = new JLabel();
-        
-        //instanciar elementos de las posibles recetas
-        String[] posiblesRecetas = {"Receta1", "Receta2", "Receta3"};
-        posiblesRecetasList = new JList(posiblesRecetas);
-        scrollRecetas = new JScrollPane(posiblesRecetasList);
-        
-        //centrar los labels
-        textoCategorias.setHorizontalAlignment(SwingConstants.LEFT);
-        textoRecetas.setHorizontalAlignment(SwingConstants.CENTER);
-        buscador.setHorizontalAlignment(SwingConstants.CENTER);
-        textoResultado.setHorizontalAlignment(SwingConstants.CENTER);
-        
-        //titulo de la interfaz
-        setTitle("Bon Apetit v1.0");
-        //agregando las categorias
+        //agregar todo al frame
         getContentPane().add(categorias, BorderLayout.NORTH);
         categorias.add(textoCategorias);
         categorias.add(picoteo);
@@ -91,23 +67,20 @@ public class BonApetit extends JFrame{
         categorias.add(platoprincipal);
         categorias.add(tragos);
         categorias.add(postres);
+    }
+    
+    void filtroIngredientes(){
+        //instanciar panel
+        filtroIngredientes = new JPanel();
         
-        //agregando las recetas
-        getContentPane().add(recetas, BorderLayout.CENTER);
-        JPanel contenedorRecetas = new JPanel();
-        contenedorRecetas.setLayout(new GridLayout(2,2,20,180));
-        textoRecetas.setText("Titulo Receta");
-        contenedorRecetas.add(textoRecetas);
-        fotoreceta.setText("Foto Receta");
-        ingredientesreceta.setText("Lista de Ingredientes");
-        preparacionreceta.setText("Preparacion");
-        contenedorRecetas.add(fotoreceta);
-        contenedorRecetas.add(ingredientesreceta);
-        contenedorRecetas.add(preparacionreceta);
-        recetas.add(contenedorRecetas);
+        //instanciar elementos
+        buscador = new JTextField("Buscar ingrediente", 20);
+        buscador.setHorizontalAlignment(SwingConstants.CENTER);
+        String[] ingr = {"Carne", "Papas", "Tomate"};
+        ingredientes = new JList(ingr);
+        contenedoringredientes = new JScrollPane(ingredientes);
         
-        
-        //agregando el filtro ingredientes
+        //agregando
         getContentPane().add(filtroIngredientes, BorderLayout.WEST);
         filtroIngredientes.setLayout(new GridLayout(2,1));
         JPanel buscadorPanel = new JPanel();
@@ -116,11 +89,41 @@ public class BonApetit extends JFrame{
         filtroIngredientes.add(buscadorPanel);
         filtroIngredientes.add(contenedoringredientes);
         
+    }
+    
+    void contruirRecetas(){
+        //instanciar el panel
+        recetas = new JPanel();
+        
+        //instanciar los elementos
+        textoRecetas = new JLabel("Nombre Receta");
+        fotoreceta = new JLabel("Foto Receta");
+        ingredientesreceta = new JLabel("Lista Ingredientes");
+        preparacionreceta = new JLabel("Pasos para preparar");
+        
+        //agregar
+        getContentPane().add(recetas, BorderLayout.CENTER);
+        JPanel contenedorRecetas = new JPanel();
+        contenedorRecetas.setLayout(new GridLayout(2,2,20,180));
+        contenedorRecetas.add(textoRecetas);
+        contenedorRecetas.add(fotoreceta);
+        contenedorRecetas.add(ingredientesreceta);
+        contenedorRecetas.add(preparacionreceta);
+        recetas.add(contenedorRecetas);
+    }
+    
+    void construirResultadoBusqueda(){
+        //agregar el panel
+        resultado = new JPanel();
+        
+        //instanciar elementos de las posibles recetas
+        String[] posiblesRecetas = {"Receta1", "Receta2", "Receta3"};
+        posiblesRecetasList = new JList(posiblesRecetas);
+        scrollRecetas = new JScrollPane(posiblesRecetasList);
+        
         //agregando el resultado
         getContentPane().add(resultado, BorderLayout.EAST);
         resultado.add(scrollRecetas);
-        
-        pack();
     }
     public static void main(String[] args) {
         JFrame v = new BonApetit();
