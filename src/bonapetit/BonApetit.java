@@ -8,9 +8,7 @@ public class BonApetit extends JFrame{
     private JPanel categorias;
     private JLabel textoCategorias;
     private JPanel recetas;
-    private JLabel textoRecetas;
     private JPanel filtroIngredientes;
-    private JPanel buscadorIngredientes;
     private JPanel resultado;
     private JLabel textoResultado;
     
@@ -26,6 +24,12 @@ public class BonApetit extends JFrame{
     private JList ingredientes;
     private JScrollPane contenedoringredientes;
     
+    //elementos recetas display
+    private JLabel textoRecetas, fotoreceta,ingredientesreceta,preparacionreceta;
+    
+    //elementos posibles recetas 
+    private JList posiblesRecetasList;
+    private JScrollPane scrollRecetas;
     
     //constructor
     public BonApetit(){
@@ -33,7 +37,6 @@ public class BonApetit extends JFrame{
         categorias = new JPanel();
         recetas = new JPanel();
         filtroIngredientes = new JPanel();
-        buscadorIngredientes = new JPanel();
         resultado = new JPanel();
         
         //icono categoria
@@ -61,6 +64,17 @@ public class BonApetit extends JFrame{
         ingredientes = new JList(ingr);
         contenedoringredientes = new JScrollPane(ingredientes);
         
+        //instanciar elementos display
+        
+        fotoreceta = new JLabel();
+        ingredientesreceta = new JLabel();
+        preparacionreceta = new JLabel();
+        
+        //instanciar elementos de las posibles recetas
+        String[] posiblesRecetas = {"Receta1", "Receta2", "Receta3"};
+        posiblesRecetasList = new JList(posiblesRecetas);
+        scrollRecetas = new JScrollPane(posiblesRecetasList);
+        
         //centrar los labels
         textoCategorias.setHorizontalAlignment(SwingConstants.LEFT);
         textoRecetas.setHorizontalAlignment(SwingConstants.CENTER);
@@ -77,19 +91,34 @@ public class BonApetit extends JFrame{
         categorias.add(platoprincipal);
         categorias.add(tragos);
         categorias.add(postres);
+        
         //agregando las recetas
-        getContentPane().add(recetas, BorderLayout.EAST);
-        textoRecetas.setText("Recetas sin Filtro");
-        recetas.add(textoRecetas);
+        getContentPane().add(recetas, BorderLayout.CENTER);
+        JPanel contenedorRecetas = new JPanel();
+        contenedorRecetas.setLayout(new GridLayout(2,2,20,180));
+        textoRecetas.setText("Titulo Receta");
+        contenedorRecetas.add(textoRecetas);
+        fotoreceta.setText("Foto Receta");
+        ingredientesreceta.setText("Lista de Ingredientes");
+        preparacionreceta.setText("Preparacion");
+        contenedorRecetas.add(fotoreceta);
+        contenedorRecetas.add(ingredientesreceta);
+        contenedorRecetas.add(preparacionreceta);
+        recetas.add(contenedorRecetas);
+        
+        
         //agregando el filtro ingredientes
-        getContentPane().add(buscadorIngredientes, BorderLayout.WEST);
         getContentPane().add(filtroIngredientes, BorderLayout.WEST);
-        buscadorIngredientes.add(buscador);
+        filtroIngredientes.setLayout(new GridLayout(2,1));
+        JPanel buscadorPanel = new JPanel();
+        buscadorPanel.setLayout(new FlowLayout());
+        buscadorPanel.add(buscador);
+        filtroIngredientes.add(buscadorPanel);
         filtroIngredientes.add(contenedoringredientes);
+        
         //agregando el resultado
-        getContentPane().add(resultado, BorderLayout.CENTER);
-        textoResultado.setText("Aqui van las recetas desplegadas");
-        resultado.add(textoResultado);
+        getContentPane().add(resultado, BorderLayout.EAST);
+        resultado.add(scrollRecetas);
         
         pack();
     }
