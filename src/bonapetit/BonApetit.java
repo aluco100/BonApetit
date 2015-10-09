@@ -12,8 +12,9 @@ public class BonApetit extends JFrame{
     private JLabel textoCategorias;
     
     //elementos filtro ingredientes
-    private JTextField buscador;
-    private JList ingredientes;
+    private JLabel listaIngredientes;
+    private JComboBox ingredientes;
+    private JButton agregarIngredientes;
     private JScrollPane contenedoringredientes;
     
     //elementos recetas display
@@ -35,6 +36,15 @@ public class BonApetit extends JFrame{
         construirResultadoBusqueda();
         
         pack();
+        
+        //en caso de cerrarse detener programa
+        addWindowListener(
+            new WindowAdapter(){
+                public void windowClosing (WindowEvent evt){
+                    System.exit(0);
+                }
+            }
+        );
     }
     
     void construirCategorias(){
@@ -74,18 +84,19 @@ public class BonApetit extends JFrame{
         filtroIngredientes = new JPanel();
         
         //instanciar elementos
-        buscador = new JTextField("Buscar ingrediente", 20);
-        buscador.setHorizontalAlignment(SwingConstants.CENTER);
+        listaIngredientes = new JLabel("Lista de Ingredientes ");
+        agregarIngredientes = new JButton("Agregar");
         String[] ingr = {"Carne", "Papas", "Tomate"};
-        ingredientes = new JList(ingr);
-        contenedoringredientes = new JScrollPane(ingredientes);
+        ingredientes = new JComboBox(ingr);
+        ingredientes.setSelectedIndex(0);
+        contenedoringredientes = new JScrollPane(listaIngredientes);
         
         //agregando
         getContentPane().add(filtroIngredientes, BorderLayout.WEST);
         filtroIngredientes.setLayout(new GridLayout(2,1));
         JPanel buscadorPanel = new JPanel();
-        buscadorPanel.setLayout(new FlowLayout());
-        buscadorPanel.add(buscador);
+        buscadorPanel.add(ingredientes);
+        buscadorPanel.add(agregarIngredientes);
         filtroIngredientes.add(buscadorPanel);
         filtroIngredientes.add(contenedoringredientes);
         
@@ -122,8 +133,11 @@ public class BonApetit extends JFrame{
         scrollRecetas = new JScrollPane(posiblesRecetasList);
         
         //agregando el resultado
-        getContentPane().add(resultado, BorderLayout.EAST);
+        JPanel contenedorResultado = new JPanel();
+        contenedorResultado.setLayout(new FlowLayout());
+        contenedorResultado.add(resultado);
         resultado.add(scrollRecetas);
+        getContentPane().add(contenedorResultado, BorderLayout.EAST);
     }
     public static void main(String[] args) {
         JFrame v = new BonApetit();
