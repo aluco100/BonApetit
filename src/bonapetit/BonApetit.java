@@ -139,6 +139,14 @@ public class BonApetit extends JFrame{
         resultado.add(scrollRecetas);
         getContentPane().add(contenedorResultado, BorderLayout.EAST);
     }
+    
+    void Eventos(){
+        ActionListener al1 = new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                
+            }
+        };
+    }
     public static void main(String[] args) {
         JFrame v = new BonApetit();
         v.setVisible(true);
