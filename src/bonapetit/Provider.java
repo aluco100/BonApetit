@@ -1,15 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package bonapetit;
-
-/**
- *
- * @author ignacia
- */
-
 import java.io.IOException;
 import java.net.URL;
  
@@ -21,7 +10,7 @@ import org.json.simple.parser.ParseException;
  
 public class Provider {
     
-    private String URL;
+    private final String URL;
     
     //constructor
     public Provider(String url){
@@ -38,11 +27,24 @@ public class Provider {
             // get the data
             genreArray = (JSONArray) genreJsonObject.get("results");
             // get the first genre
-            JSONObject firstGenre = (JSONObject) genreArray.get(0);
-            System.out.println(firstGenre.get("title"));
+           
         } catch (IOException | ParseException e) {
-            e.printStackTrace();
         }
         return genreArray;
-    } 
+    }
+    
+    public String[] defaultRecetas(){
+        JSONArray resultJSON = this.getJSONQuery();
+        
+        JSONObject aux;
+        
+        String[] posiblesRecetas = new String[resultJSON.size()];
+        
+        for(int i=0; i<resultJSON.size();i++){
+        aux = (JSONObject)resultJSON.get(i);
+        posiblesRecetas[i]= aux.get("title").toString();
+        }
+        
+        return posiblesRecetas;
+    }
 }

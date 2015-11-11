@@ -3,7 +3,22 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.net.*;
+import java.util.*;
+import javax.swing.event.*;
+
+import java.io.IOException;
+import java.net.URL;
+ 
+import org.apache.commons.io.IOUtils;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+import org.json.simple.parser.ParseException;
+ 
 public class BonApetit extends JFrame{
+    
+   public  JSONArray resultadojson;
+    
     //paneles
     private JPanel categorias,recetas,filtroIngredientes,resultado;
     
@@ -34,12 +49,14 @@ public class BonApetit extends JFrame{
         filtroIngredientes();
         contruirRecetas();
         construirResultadoBusqueda();
+        construirEventos();
         
         pack();
         
         //en caso de cerrarse detener programa
         addWindowListener(
             new WindowAdapter(){
+                @Override
                 public void windowClosing (WindowEvent evt){
                     System.exit(0);
                 }
@@ -47,7 +64,7 @@ public class BonApetit extends JFrame{
         );
     }
     
-    void construirCategorias(){
+    private void construirCategorias(){
         //inicializar el panel de categoria
         categorias = new JPanel();
         
@@ -63,11 +80,13 @@ public class BonApetit extends JFrame{
         textoCategorias.setHorizontalAlignment(SwingConstants.LEFT);
         
         //inicializar los botones
-        picoteo = new JButton("picoteo");
-        ensalada = new JButton("ensaladas");
-        platoprincipal = new JButton("dishes");
-        tragos = new JButton("tragos");
-        postres = new JButton("postres");
+        picoteo = new JButton("Snack");
+        ensalada = new JButton("Salad");
+        platoprincipal = new JButton("Main Dish");
+        tragos = new JButton("Drink");
+        postres = new JButton("Dessert");
+        
+        
         
         //agregar todo al frame
         getContentPane().add(categorias, BorderLayout.NORTH);
@@ -79,7 +98,7 @@ public class BonApetit extends JFrame{
         categorias.add(postres);
     }
     
-    void filtroIngredientes(){
+    private void filtroIngredientes(){
         //instanciar panel
         filtroIngredientes = new JPanel();
         
@@ -102,7 +121,7 @@ public class BonApetit extends JFrame{
         
     }
     
-    void contruirRecetas(){
+    private void contruirRecetas(){
         //instanciar el panel
         recetas = new JPanel();
         
@@ -116,6 +135,7 @@ public class BonApetit extends JFrame{
         getContentPane().add(recetas, BorderLayout.CENTER);
         JPanel contenedorRecetas = new JPanel();
         contenedorRecetas.setLayout(new GridLayout(2,2,20,180));
+        textoRecetas.setHorizontalAlignment(JLabel.RIGHT);
         contenedorRecetas.add(textoRecetas);
         contenedorRecetas.add(fotoreceta);
         contenedorRecetas.add(ingredientesreceta);
@@ -123,13 +143,13 @@ public class BonApetit extends JFrame{
         recetas.add(contenedorRecetas);
     }
     
-    void construirResultadoBusqueda(){
+    private void construirResultadoBusqueda(){
         //agregar el panel
         resultado = new JPanel();
         
-        //instanciar elementos de las posibles recetas
-        String[] posiblesRecetas = {"Receta1", "Receta2", "Receta3"};
-        posiblesRecetasList = new JList(posiblesRecetas);
+        Provider p = new Provider("http://www.recipepuppy.com/api/?i=onions,garlic&q=omelet&p=3");
+        resultadojson = p.getJSONQuery();
+        posiblesRecetasList = new JList(p.defaultRecetas());
         scrollRecetas = new JScrollPane(posiblesRecetasList);
         
         //agregando el resultado
@@ -139,17 +159,93 @@ public class BonApetit extends JFrame{
         resultado.add(scrollRecetas);
         getContentPane().add(contenedorResultado, BorderLayout.EAST);
     }
+    private void construirEventos(){
+        
+        ActionListener al1;
+       al1 = new ActionListener(){
+           @Override
+           public void actionPerformed(ActionEvent e){
+               Categoria categoria = new Categoria("Snack");
+               resultadojson = categoria.getJSONResult();
+               posiblesRecetasList.setListData(categoria.getRecipiesByCategory());
+           }
+       };
+        
+        ActionListener al2;
+       al2 = new ActionListener(){
+           @Override
+           public void actionPerformed(ActionEvent e){
+               Categoria categoria = new Categoria("Salad");
+               resultadojson = categoria.getJSONResult();
+               posiblesRecetasList.setListData(categoria.getRecipiesByCategory());
+           }
+       };
+        
+         ActionListener al3;
+       al3 = new ActionListener(){
+           @Override
+           public void actionPerformed(ActionEvent e){
+               Categoria categoria = new Categoria("Dish");
+               resultadojson = categoria.getJSONResult();
+               posiblesRecetasList.setListData(categoria.getRecipiesByCategory());
+           }
+       };
+         
+          ActionListener al4;
+       al4 = new ActionListener(){
+           @Override
+           public void actionPerformed(ActionEvent e){
+               Categoria categoria = new Categoria("Drinks");
+               resultadojson = categoria.getJSONResult();
+               posiblesRecetasList.setListData(categoria.getRecipiesByCategory());
+           }
+       };
+          
+           ActionListener al5;
+       al5 = new ActionListener(){
+           @Override
+           public void actionPerformed(ActionEvent e){
+               Categoria categoria = new Categoria("Dessert");
+               resultadojson = categoria.getJSONResult();
+               posiblesRecetasList.setListData(categoria.getRecipiesByCategory());
+           }
+       };
+           
+       ListSelectionListener al6;
+       al6 = new ListSelectionListener(){
+           @Override
+           public void valueChanged(ListSelectionEvent e) {
+               String nombreReceta = posiblesRecetasList.getSelectedValue().toString();
+               Recipe receta = new Recipe(nombreReceta);
+               String titulo_Aux = receta.getParameter(resultadojson, "title");
+               String Ingredientes = receta.getParameter(resultadojson, "ingredients");
+               String link = receta.getParameter(resultadojson, "href");
+               String foto_Aux = receta.getParameter(resultadojson, "thumbnail");
+               
+               textoRecetas.setText(titulo_Aux);
+               fotoreceta.setText("");
+               fotoreceta.setIcon(receta.parseImage(foto_Aux));
+               ingredientesreceta.setText(Ingredientes);
+               preparacionreceta.setText(link);
+           }
+       };
+       
+     
+
+           
+        picoteo.addActionListener(al1);
+        ensalada.addActionListener(al2);
+        platoprincipal.addActionListener(al3);
+        tragos.addActionListener(al4);
+        postres.addActionListener(al5);
+        posiblesRecetasList.addListSelectionListener(al6);
+        
     
-    void Eventos(){
-        ActionListener al1 = new ActionListener(){
-            public void actionPerformed(ActionEvent e){
-                
-            }
-        };
     }
     public static void main(String[] args) {
         JFrame v = new BonApetit();
         v.setVisible(true);
+     
     }
     
 }
