@@ -8,6 +8,9 @@ import javax.swing.event.*;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
  
 import org.apache.commons.io.IOUtils;
 import org.json.simple.JSONArray;
@@ -28,13 +31,15 @@ public class BonApetit extends JFrame{
     
     //elementos filtro ingredientes
     private JLabel listaIngredientes;
-    private JComboBox ingredientes;
+    private JTextField ingredientes;
+    private IngredientManager IngrMngr = new IngredientManager();
     private JButton agregarIngredientes;
     private JScrollPane contenedoringredientes;
+    private JButton limpiar;
     
     //elementos recetas display
-    private JLabel textoRecetas, fotoreceta,ingredientesreceta,preparacionreceta;
-    
+    private JLabel textoRecetas, fotoreceta,ingredientesreceta;
+    private JButton preparacionreceta;
     //elementos posibles recetas 
     private JList posiblesRecetasList;
     private JScrollPane scrollRecetas;
@@ -105,9 +110,12 @@ public class BonApetit extends JFrame{
         //instanciar elementos
         listaIngredientes = new JLabel("Lista de Ingredientes ");
         agregarIngredientes = new JButton("Agregar");
-        String[] ingr = {"Carne", "Papas", "Tomate"};
-        ingredientes = new JComboBox(ingr);
-        ingredientes.setSelectedIndex(0);
+        limpiar = new JButton ();
+        try{
+        Image img = ImageIO.read(getClass().getResource("clean.png"));
+        limpiar.setIcon(new ImageIcon(img));
+        } catch (IOException ex){}
+        ingredientes = new JTextField("",10);
         contenedoringredientes = new JScrollPane(listaIngredientes);
         
         //agregando
@@ -116,6 +124,7 @@ public class BonApetit extends JFrame{
         JPanel buscadorPanel = new JPanel();
         buscadorPanel.add(ingredientes);
         buscadorPanel.add(agregarIngredientes);
+        buscadorPanel.add(limpiar);
         filtroIngredientes.add(buscadorPanel);
         filtroIngredientes.add(contenedoringredientes);
         
@@ -129,7 +138,7 @@ public class BonApetit extends JFrame{
         textoRecetas = new JLabel("Nombre Receta");
         fotoreceta = new JLabel("Foto Receta");
         ingredientesreceta = new JLabel("Lista Ingredientes");
-        preparacionreceta = new JLabel("Pasos para preparar");
+        preparacionreceta = new JButton("Pasos para preparar");
         
         //agregar
         getContentPane().add(recetas, BorderLayout.CENTER);
@@ -224,13 +233,65 @@ public class BonApetit extends JFrame{
                
                textoRecetas.setText(titulo_Aux);
                fotoreceta.setText("");
-               fotoreceta.setIcon(receta.parseImage(foto_Aux));
+               try {
+                   fotoreceta.setIcon(receta.parseImage(foto_Aux));
+               } catch (IOException ex) {
+                   Logger.getLogger(BonApetit.class.getName()).log(Level.SEVERE, null, ex);
+               }
                ingredientesreceta.setText(Ingredientes);
                preparacionreceta.setText(link);
            }
        };
        
-     
+       
+       ActionListener al7;
+       al7 = new ActionListener(){
+           @Override
+           public void actionPerformed(ActionEvent e){
+               String textofiltro = ingredientes.getText();
+               IngrMngr.addIngredient(textofiltro);
+               String memory = IngrMngr.getIngredientsMemory();
+               listaIngredientes.setText(memory);
+               Provider p = new Provider("http://www.recipepuppy.com/api/?i="+memory);
+               resultadojson=p.getJSONQuery();
+               Parser filtroactual= new Parser(resultadojson);
+               String[] posiblesrecetas = filtroactual.getPosiblesRecetas();
+               posiblesRecetasList.setListData(posiblesrecetas);
+           }
+       };
+       
+       ActionListener al8;
+       al8 = new ActionListener(){
+           @Override
+           public void actionPerformed(ActionEvent e){
+              IngrMngr.clearIngredient();
+              String memory = IngrMngr.getIngredientsMemory();
+              listaIngredientes.setText(memory);
+              ingredientes.setText(memory);
+              Provider p = new Provider("http://www.recipepuppy.com/api/?");
+               resultadojson=p.getJSONQuery();
+               Parser filtroactual= new Parser(resultadojson);
+               String[] posiblesrecetas = filtroactual.getPosiblesRecetas();
+               posiblesRecetasList.setListData(posiblesrecetas);
+           }
+       };
+       
+       ActionListener al9;
+       al9 = new ActionListener(){
+           @Override
+           public void actionPerformed(ActionEvent e){
+               String url = preparacionreceta.getText();
+               URI uri;
+               try {
+                   uri = new URI(url);
+                   Desktop dt = Desktop.getDesktop();
+                   dt.browse(uri);
+               } catch (URISyntaxException | IOException ex) {
+                   Logger.getLogger(BonApetit.class.getName()).log(Level.SEVERE, null, ex);
+               } 
+               
+           }
+       };
 
            
         picoteo.addActionListener(al1);
@@ -239,6 +300,9 @@ public class BonApetit extends JFrame{
         tragos.addActionListener(al4);
         postres.addActionListener(al5);
         posiblesRecetasList.addListSelectionListener(al6);
+        agregarIngredientes.addActionListener(al7);
+        limpiar.addActionListener(al8);
+        preparacionreceta.addActionListener(al9);
         
     
     }
